@@ -5,7 +5,7 @@ This [Embulk](https://github.com/embulk/embulk) input plugin for Slack chat hist
 ## Configuration
 
 - **token** Slack API token 'Generate from https://api.slack.com/' (string, required)
-- **continuous** last time read continuation (integer, default: false)
+- **continuous** last time read continuation (string, default: false)
 - **filepath** continuous information file save path (string, default: /tmp)
 
 ### Example
