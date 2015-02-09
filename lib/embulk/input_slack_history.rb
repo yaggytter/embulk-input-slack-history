@@ -4,41 +4,55 @@ module Embulk
     require 'json'
     require 'rest-client'
 
+    class SlackApiException < Exception; end
+
     class SlackApi
 
       def initialize(token)
         @token = token
-        @members = Hash.new()
-        @groups = Hash.new()
-        @channels = Hash.new()
+        @members = {}
+        @groups = {}
+        @channels = {}
       end
 
       def pre()
 
         # TODO: need implement error handling
-        # I still do not know how the error handling for embulk plugin
+        # HTTP Status Code
+        # RestClient Exception
+        # result is NOT 'ok'
 
         json = RestClient.get('https://slack.com/api/channels.list?token=' + @token + '&pretty=1')
         result = JSON.parse(json)
 
         if !result['ok'] then
-          return false
+          raise SlackApiException
         end
 
         result["channels"].each{|channel|
-          @channels.store(channel["id"], channel["name"])
+          @channels[channel["id"]] = channel["name"]
         }
 
         json = RestClient.get('https://slack.com/api/groups.list?token=' + @token + '&pretty=1')
         result = JSON.parse(json)
+
+        if !result['ok'] then
+          raise SlackApiException
+        end
+
         result["groups"].each{|group|
-          @groups.store(group["id"], group["name"])
+          @groups[group["id"]] = group["name"]
         }
 
         json = RestClient.get('https://slack.com/api/users.list?token=' + @token + '&pretty=1')
         result = JSON.parse(json)
+
+        if !result['ok'] then
+          raise SlackApiException
+        end
+
         result["members"].each{|member|
-          @members.store(member["id"], member["name"])
+          @members[member["id"]] = member["name"]
         }
 
         return true
@@ -47,7 +61,7 @@ module Embulk
       
       def parse_history(message)
 
-        res = Hash.new()
+        res = {}
 
         res.store("ts", message["ts"])
         res.store("username", @members[message["user"]])
@@ -64,7 +78,7 @@ module Embulk
 
       def get_continuous_param(continuous, filepath, channelid)
 
-        if continuous != "true" then
+        if !continuous then
           return ""
         end
 
@@ -86,7 +100,7 @@ module Embulk
 
       def update_oldest(continuous, filepath, channelid, newest)
 
-        if continuous != "true" || newest == 0.0 then
+        if !continuous || newest == 0.0 then
           return
         end        
 
@@ -97,7 +111,7 @@ module Embulk
 
       def get_history_by_channels(continuous, filepath, channels, isprivate)
 
-        res = Array.new()
+        res = []
         i = 0
 
         channels.each{|id, name|
@@ -162,7 +176,7 @@ module Embulk
         threads = 1
 
         token = config.param('token', :string)
-        continuous = config.param('continuous', :string, default: 'false')
+        continuous = config.param('continuous', :bool, default: false)
         filepath = config.param('filepath', :string, default: '/tmp')
 
         task = {
