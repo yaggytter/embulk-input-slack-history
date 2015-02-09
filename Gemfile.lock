@@ -1,14 +1,19 @@
-GEM
-  remote: https://rubygems.org/
+PATH
+  remote: .
   specs:
-    mime-types (2.4.3)
-    netrc (0.10.2)
+    embulk-plugin-input-slack-history (0.0.1)
+      rest-client (>= 1.7.2)
+
+GEM
+  remote: http://rubygems.org/
+  specs:
     rest-client (1.7.2)
-      mime-types (>= 1.16, < 3.0)
-      netrc (~> 0.7)
+    rake (10.4.2)
 
 PLATFORMS
-  java
+  ruby
 
 DEPENDENCIES
-  rest-client
+  bundler (~> 1.0)
+  embulk-plugin-input-slack-history!
+  rake (>= 0.9.2)

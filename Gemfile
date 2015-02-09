@@ -1,4 +1,2 @@
-source 'https://rubygems.org/'
-
-gem 'rest-client'
-
+source "http://rubygems.org"
+gemspec
