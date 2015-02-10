@@ -2,6 +2,11 @@
 
 This [Embulk](https://github.com/embulk/embulk) input plugin for Slack chat history.
 
+
+## Installation
+
+  $ java -jar embulk.jar gem install embulk-plugin-input-slack-history
+
 ## Configuration
 
 - **token** Slack API token 'Generate from https://api.slack.com/' (string, required)
@@ -16,14 +21,13 @@ in:
   token: slackapitoken
   continuous: true # optional
   filepath: /tmp # optional
-  columns:
-    - { name: channelid, type: string }
-    - { name: channelname, type: string }
-    - { name: private, type: string }
-    - { name: datetime, type: timestamp }
-    - { name: username, type: string }
-    - { name: userid, type: string }
-    - { name: message, type: string }
 out:
   type: stdout
 ```
+
+## TODO
+
+- attachment file download
+- do not update *.oldest file at preview time
+- error handling and resume
+- multi thread execute Slack API if needed
