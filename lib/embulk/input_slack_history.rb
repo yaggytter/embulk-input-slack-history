@@ -22,7 +22,7 @@ module Embulk
         # RestClient Exception
         # result is NOT 'ok'
 
-        json = RestClient.get('https://slack.com/api/channels.list?token=' + @token + '&pretty=1')
+        json = RestClient.get('https://slack.com/api/channels.list', {:params => {'token' => @token, 'pretty' => 1}})
         result = JSON.parse(json)
 
         if !result['ok'] then
@@ -33,7 +33,7 @@ module Embulk
           @channels[channel["id"]] = channel["name"]
         }
 
-        json = RestClient.get('https://slack.com/api/groups.list?token=' + @token + '&pretty=1')
+        json = RestClient.get('https://slack.com/api/groups.list', {:params => {'token' => @token, 'pretty' => 1}})
         result = JSON.parse(json)
 
         if !result['ok'] then
@@ -44,7 +44,7 @@ module Embulk
           @groups[group["id"]] = group["name"]
         }
 
-        json = RestClient.get('https://slack.com/api/users.list?token=' + @token + '&pretty=1')
+        json = RestClient.get('https://slack.com/api/users.list', {:params => {'token' => @token, 'pretty' => 1}})
         result = JSON.parse(json)
 
         if !result['ok'] then
@@ -63,10 +63,10 @@ module Embulk
 
         res = {}
 
-        res.store("ts", message["ts"])
-        res.store("username", @members[message["user"]])
-        res.store("userid", message["user"])
-        res.store("message", message["text"])
+        res["ts"] = message["ts"]
+        res["username"] = @members[message["user"]]
+        res["userid"] = message["user"]
+        res["message"] = message["text"]
 
         return res
 
@@ -123,7 +123,7 @@ module Embulk
 
           param = get_continuous_param(continuous, filepath, id)
 
-          json = RestClient.get('https://slack.com/api/' + api + '.history?token=' + @token + '&channel=' + id + '&pretty=1' + param)
+          json = RestClient.get('https://slack.com/api/' + api + '.history', {:params => {'token' => @token, 'channel' => id, 'pretty' => 1}})
           result = JSON.parse(json)
 
           newest = 0.0
@@ -131,9 +131,9 @@ module Embulk
           result["messages"].each{|message|
 
             mes = parse_history(message)
-            mes.store("channelid", id)
-            mes.store("channelname", name)
-            mes.store("private", isprivate)
+            mes["channelid"] = id
+            mes["channelname"] = name
+            mes["private"] = isprivate
             res[i] = mes
             i += 1
 
@@ -178,11 +178,13 @@ module Embulk
         token = config.param('token', :string)
         continuous = config.param('continuous', :bool, default: false)
         filepath = config.param('filepath', :string, default: '/tmp')
+        preview = config.param('preview', :string, default: 'no')
 
         task = {
           'token' => token,
           'continuous' => continuous,
-          'filepath' => filepath
+          'filepath' => filepath,
+          'preview' => preview
         }
 
         columns = [
@@ -197,7 +199,7 @@ module Embulk
 
         puts "Slack history input started."
         commit_reports = yield(task, columns, threads)
-        puts "Slack history input finished. Commit reports = #{commit_reports.to_json}"
+        puts "Slack history input finished."
 
         next_config_diff = {}
         return next_config_diff
