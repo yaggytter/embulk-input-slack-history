@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    embulk-plugin-input-slack-history (0.0.1)
+    embulk-plugin-input-slack-history (0.0.2)
       rest-client (>= 1.7.2)
 
 GEM

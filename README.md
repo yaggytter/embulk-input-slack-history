@@ -5,7 +5,7 @@ This [Embulk](https://github.com/embulk/embulk) input plugin for Slack chat hist
 
 ## Installation
 
-  $ java -jar embulk.jar gem install embulk-plugin-input-slack-history
+		$ java -jar embulk.jar gem install embulk-plugin-input-slack-history
 
 ## Configuration
 
