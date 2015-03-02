@@ -1,7 +1,7 @@
 
 Gem::Specification.new do |gem|
   gem.name          = "embulk-input-slack-history"
-  gem.version       = "0.1.0"
+  gem.version       = "0.1.1"
 
   gem.summary       = %q{Embulk input plugin for Slack chat history}
   gem.description   = gem.summary

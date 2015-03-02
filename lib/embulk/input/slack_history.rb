@@ -92,9 +92,7 @@ module Embulk
 
         line = File.read(fullpath)
 
-        param = "&oldest=" + line + "&inclusive=0"
-
-        return param
+        return line
 
       end
 
@@ -121,9 +119,9 @@ module Embulk
             api = "groups"
           end
 
-          param = get_continuous_param(continuous, filepath, id)
+          oldest = get_continuous_param(continuous, filepath, id)
 
-          json = RestClient.get('https://slack.com/api/' + api + '.history', {:params => {'token' => @token, 'channel' => id, 'pretty' => 1}})
+          json = RestClient.get('https://slack.com/api/' + api + '.history', {:params => {'token' => @token, 'channel' => id, 'oldest' => oldest, 'inclusive' => 0, 'pretty' => 1}})
           result = JSON.parse(json)
 
           newest = 0.0
